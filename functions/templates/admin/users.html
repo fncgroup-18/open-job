@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin Panel{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+                <div>
+                    <!-- Breadcrumb -->
+                    <nav class="breadcrumb mb-4">
+                        <ol class="flex items-center space-x-2">
+                            <li><a href="{{ url_for('admin_dashboard.dashboard') }}" class="text-muted-foreground hover:text-foreground">Admin</a></li>
+                            <li><span class="text-muted-foreground">/</span></li>
+                            <li><span class="text-foreground">Users</span></li>
+                        </ol>
+                    </nav>
+
+                    <h1 class="text-3xl font-bold mb-2">User Management</h1>
+                    <p class="text-muted-foreground">Manage user accounts and permissions</p>
+                </div>
+
+                <div class="mt-4 lg:mt-0">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative">
+                            <input type="text" placeholder="Search users..." class="input pl-10 pr-4" onkeyup="filterUsers(this.value)">
+                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="bg-card rounded-lg border border-border overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users.items %}
+                            <tr>
+                                <td>
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                                            <span class="text-primary font-semibold text-sm">{{ user.username[0]|upper }}</span>
+                                        </div>
+                                        <span class="font-medium">{{ user.username }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge {% if user.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                                        {{ 'Active' if user.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.is_admin %}
+                                    <span class="badge badge-primary">Admin</span>
+                                    {% else %}
+                                    <span class="badge ">User</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <div class="flex space-x-2">
+                                        <form method="POST" action="{{ url_for('admin_dashboard.toggle_user_status', user_id=user.id) }}" class="inline"
+                                              onsubmit="return confirm('Are you sure you want to {% if user.is_active %}deactivate{% else %}activate{% endif %} this user?')">
+                                            <button type="submit" class="btn-icon-small" title="{% if user.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                                {% if user.is_active %}
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                </svg>
+                                                {% else %}
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if users.pages > 1 %}
+                <div class="p-4 border-t border-border">
+                    <nav class="pagination" aria-label="Users pagination">
+                        {% if users.has_prev %}
+                        <a href="{{ url_for('admin_dashboard.manage_users', page=users.prev_num) }}" class="btn-outline">
+                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Previous
+                        </a>
+                        {% else %}
+                        <span class="btn-outline disabled">Previous</span>
+                        {% endif %}
+
+                        <div class="flex items-center space-x-1">
+                            {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                            {% if page_num == users.page %}
+                            <span class="btn-outline active" aria-current="page">{{ page_num }}</span>
+                            {% else %}
+                            <a href="{{ url_for('admin_dashboard.manage_users', page=page_num) }}" class="btn-outline">{{ page_num }}</a>
+                            {% endif %}
+                            {% else %}
+                            <span class="btn-outline disabled">...</span>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {% if users.has_next %}
+                        <a href="{{ url_for('admin_dashboard.manage_users', page=users.next_num) }}" class="btn-outline">
+                            Next
+                            <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        {% else %}
+                        <span class="btn-outline disabled">Next</span>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- User Stats -->
+            <div class="mt-8 grid md:grid-cols-3 gap-6">
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-primary mb-2">{{ users.total }}</div>
+                    <div class="text-muted-foreground">Total Users</div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">{{ users.items|selectattr('is_active')|list|length }}</div>
+                    <div class="text-muted-foreground">Active Users</div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">{{ users.items|selectattr('is_admin')|list|length }}</div>
+                    <div class="text-muted-foreground">Administrators</div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

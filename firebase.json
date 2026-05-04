@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "openjobs",
+        "region": "us-central1"
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": ["venv", ".git", "__pycache__", "*.pyc"]
+    }
+  ]
+}

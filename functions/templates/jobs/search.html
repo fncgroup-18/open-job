@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Search Jobs - OpenJobs{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="container mx-auto px-4">
+            <!-- Search Header -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Search Results</h1>
+                        <p class="text-muted-foreground">
+                            {% if query or location or job_type or experience %}
+                                {% set filters = [] %}
+                                {% if query %}{{ filters.append('"' + query + '"') }}{% endif %}
+                                {% if location %}{{ filters.append('location: ' + location) }}{% endif %}
+                                {% if job_type %}{{ filters.append('type: ' + job_type) }}{% endif %}
+                                {% if experience %}{{ filters.append('experience: ' + experience) }}{% endif %}
+                                {% if filters %}
+                                    Found {{ jobs.total }} jobs for {{ filters|join(', ') }}
+                                {% else %}
+                                    Found {{ jobs.total }} jobs
+                                {% endif %}
+                            {% else %}
+                                Showing all available jobs
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <a href="{{ url_for('jobs.job_board') }}" class="btn-outline">
+                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Back to All Jobs
+                    </a>
+                </div>
+
+                <!-- Active Filters -->
+                {% if query or location or job_type or experience %}
+                <div class="bg-card p-4 rounded-lg border border-border mb-6">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="text-sm font-medium text-muted-foreground">Active filters:</span>
+
+                        {% if query %}
+                        <span class="badge badge-secondary">
+                            Search: "{{ query }}"
+                            <a href="{{ url_for('jobs.search_jobs', location=location, type=job_type, experience=experience) }}" class="ml-2 text-muted-foreground hover:text-foreground">×</a>
+                        </span>
+                        {% endif %}
+
+                        {% if location %}
+                        <span class="badge badge-secondary">
+                            Location: {{ location }}
+                            <a href="{{ url_for('jobs.search_jobs', q=query, type=job_type, experience=experience) }}" class="ml-2 text-muted-foreground hover:text-foreground">×</a>
+                        </span>
+                        {% endif %}
+
+                        {% if job_type %}
+                        <span class="badge badge-secondary">
+                            Type: {{ job_type }}
+                            <a href="{{ url_for('jobs.search_jobs', q=query, location=location, experience=experience) }}" class="ml-2 text-muted-foreground hover:text-foreground">×</a>
+                        </span>
+                        {% endif %}
+
+                        {% if experience %}
+                        <span class="badge badge-secondary">
+                            Experience: {{ experience }}
+                            <a href="{{ url_for('jobs.search_jobs', q=query, location=location, type=job_type) }}" class="ml-2 text-muted-foreground hover:text-foreground">×</a>
+                        </span>
+                        {% endif %}
+
+                        <a href="{{ url_for('jobs.search_jobs') }}" class="text-sm text-muted-foreground hover:text-foreground">Clear all</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Job Listings -->
+            {% if jobs.items %}
+            <div class="space-y-4 mb-8">
+                {% for job in jobs.items %}
+                <div class="card hover:shadow-md transition-all duration-200 group">
+                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+                        <div class="flex-1 mb-4 lg:mb-0">
+                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-semibold mb-1 group-hover:text-primary transition-colors">
+                                        <a href="{{ url_for('jobs.view_job', job_id=job.id) }}">{{ job.title }}</a>
+                                    </h3>
+                                    <p class="text-muted-foreground mb-2">{{ job.company }}</p>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            {{ job.location }}
+                                        </div>
+                                        {% if job.salary_range %}
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                            </svg>
+                                            {{ job.salary_range }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            {{ job.created_at.strftime('%b %d, %Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-start sm:items-end space-y-2">
+                                    <span class="badge badge-success">{{ job.job_type }}</span>
+                                    {% if job.remote_option %}
+                                    <span class="badge ">{{ job.remote_option }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <p class="text-muted-foreground mb-3 line-clamp-2">{{ job.description }}</p>
+
+                            {% if job.skills %}
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                {% for skill in job.skills.split(',')[:4] %}
+                                <span class="badge badge-secondary text-xs">{{ skill.strip() }}</span>
+                                {% endfor %}
+                                {% if job.skills.split(',')|length > 4 %}
+                                <span class="badge badge-secondary text-xs">+{{ job.skills.split(',')|length - 4 }} more</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3 lg:ml-6">
+                            <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn btn-small flex-1 sm:flex-none">
+                                View Details
+                            </a>
+                            {% if current_user.is_authenticated and current_user.id == job.user_id %}
+                            <a href="{{ url_for('jobs.edit_job', job_id=job.id) }}" class="btn-outline btn-small flex-1 sm:flex-none">
+                                Edit
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if jobs.pages > 1 %}
+            <nav class="pagination" aria-label="Search results pagination">
+                {% if jobs.has_prev %}
+                <a href="{{ url_for('jobs.search_jobs', page=jobs.prev_num, q=query, location=location, type=job_type, experience=experience) }}" class="btn-outline">
+                    <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Previous
+                </a>
+                {% else %}
+                <span class="btn-outline disabled">Previous</span>
+                {% endif %}
+
+                <div class="flex items-center space-x-1">
+                    {% for page_num in jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                    {% if page_num == jobs.page %}
+                    <span class="btn-outline active" aria-current="page">{{ page_num }}</span>
+                    {% else %}
+                    <a href="{{ url_for('jobs.search_jobs', page=page_num, q=query, location=location, type=job_type, experience=experience) }}" class="btn-outline">{{ page_num }}</a>
+                    {% endif %}
+                    {% else %}
+                    <span class="btn-outline disabled">...</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if jobs.has_next %}
+                <a href="{{ url_for('jobs.search_jobs', page=jobs.next_num, q=query, location=location, type=job_type, experience=experience) }}" class="btn-outline">
+                    Next
+                    <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                {% else %}
+                <span class="btn-outline disabled">Next</span>
+                {% endif %}
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <!-- No Results -->
+            <div class="text-center py-16">
+                <div class="max-w-md mx-auto">
+                    <svg class="w-24 h-24 mx-auto text-muted-foreground/50 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <h3 class="text-2xl font-semibold mb-4">No Jobs Found</h3>
+                    <p class="text-muted-foreground mb-6">
+                        Try adjusting your search criteria or browse all available jobs.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="{{ url_for('jobs.job_board') }}" class="btn">View All Jobs</a>
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('jobs.create_job') }}" class="btn-outline">Post a Job</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Job - {{ job.title }} | OpenJobs{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb mb-6">
+                    <ol class="flex items-center space-x-2">
+                        <li><a href="{{ url_for('index') }}" class="text-muted-foreground hover:text-foreground">Home</a></li>
+                        <li><span class="text-muted-foreground">/</span></li>
+                        <li><a href="{{ url_for('jobs.job_board') }}" class="text-muted-foreground hover:text-foreground">Jobs</a></li>
+                        <li><span class="text-muted-foreground">/</span></li>
+                        <li><a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="text-muted-foreground hover:text-foreground">{{ job.title }}</a></li>
+                        <li><span class="text-muted-foreground">/</span></li>
+                        <li><span class="text-foreground">Edit</span></li>
+                    </ol>
+                </nav>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Edit Job Posting</h1>
+                        <p class="text-muted-foreground">Update your job listing details</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn-outline">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View Job
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <form method="POST" class="space-y-8">
+                <!-- Basic Information Section -->
+                <div class="bg-card p-8 rounded-lg border border-border shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold">Basic Information</h2>
+                            <p class="text-muted-foreground">Update the core job details</p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Job Title -->
+                        <div class="md:col-span-2">
+                            <label class="label">Job Title *</label>
+                            <input type="text" name="title" value="{{ job.title }}" class="input" required>
+                        </div>
+
+                        <!-- Company -->
+                        <div>
+                            <label class="label">Company Name *</label>
+                            <input type="text" name="company" value="{{ job.company }}" class="input" required>
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label class="label">Location *</label>
+                            <input type="text" name="location" value="{{ job.location }}" class="input" required>
+                        </div>
+
+                        <!-- Job Type -->
+                        <div>
+                            <label class="label">Job Type *</label>
+                            <select name="job_type" class="select" required>
+                                <option value="Full-time" {% if job.job_type == 'Full-time' %}selected{% endif %}>Full-time</option>
+                                <option value="Part-time" {% if job.job_type == 'Part-time' %}selected{% endif %}>Part-time</option>
+                                <option value="Contract" {% if job.job_type == 'Contract' %}selected{% endif %}>Contract</option>
+                                <option value="Internship" {% if job.job_type == 'Internship' %}selected{% endif %}>Internship</option>
+                            </select>
+                        </div>
+
+                        <!-- Experience Level -->
+                        <div>
+                            <label class="label">Experience Level</label>
+                            <select name="experience_level" class="select">
+                                <option value="">Select experience level</option>
+                                <option value="Entry" {% if job.experience_level == 'Entry' %}selected{% endif %}>Entry Level</option>
+                                <option value="Mid" {% if job.experience_level == 'Mid' %}selected{% endif %}>Mid Level</option>
+                                <option value="Senior" {% if job.experience_level == 'Senior' %}selected{% endif %}>Senior Level</option>
+                                <option value="Lead" {% if job.experience_level == 'Lead' %}selected{% endif %}>Lead</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Details Section -->
+                <div class="bg-card p-8 rounded-lg border border-border shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold">Job Details</h2>
+                            <p class="text-muted-foreground">Update description, requirements, and skills</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Description -->
+                        <div>
+                            <label class="label">Job Description *</label>
+                            <textarea name="description" class="textarea" rows="6" required>{{ job.description }}</textarea>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div>
+                            <label class="label">Requirements *</label>
+                            <textarea name="requirements" class="textarea" rows="6" required>{{ job.requirements }}</textarea>
+                        </div>
+
+                        <!-- Skills -->
+                        <div>
+                            <label class="label">Required Skills</label>
+                            <input type="text" name="skills" value="{{ job.skills }}" class="input" placeholder="Python, JavaScript, React, Node.js (comma-separated)">
+                        </div>
+
+                        <!-- Salary and Deadline Row -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="label">Salary Range</label>
+                                <input type="text" name="salary_range" value="{{ job.salary_range }}" class="input" placeholder="e.g., $60,000 - $80,000">
+                            </div>
+
+                            <div>
+                                <label class="label">Application Deadline</label>
+                                <input type="date" name="deadline" value="{{ job.deadline.strftime('%Y-%m-%d') if job.deadline else '' }}" class="input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="bg-card p-6 rounded-lg border border-border shadow-sm">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                        <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn-outline px-6 py-3 text-center">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-large px-8 py-3">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Update Job
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Job Status Info -->
+            <div class="mt-8 bg-card p-6 rounded-lg border border-border">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Job Statistics
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4 text-center">
+                    <div class="space-y-2">
+                        <div class="text-2xl font-bold text-primary">{{ job.views_count }}</div>
+                        <div class="text-muted-foreground">Total Views</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-2xl font-bold text-primary">{{ job.applications_count }}</div>
+                        <div class="text-muted-foreground">Applications</div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-2xl font-bold text-primary">{{ job.created_at.strftime('%b %d, %Y') }}</div>
+                        <div class="text-muted-foreground">Posted Date</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

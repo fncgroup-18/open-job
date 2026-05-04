@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Job - OpenJobs{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <!-- Page Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">Post a New Job</h1>
+                <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    Find the perfect candidate for your team by posting a detailed job opportunity
+                </p>
+            </div>
+
+            <!-- Job Posting Form -->
+            <form method="POST" class="space-y-8">
+                {{ form.hidden_tag() }}
+
+                <!-- Basic Information Section -->
+                <div class="bg-card p-8 rounded-lg border border-border shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold">Basic Information</h2>
+                            <p class="text-muted-foreground">Essential details about the position</p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Job Title -->
+                        <div class="md:col-span-2">
+                            <label class="label">Job Title *</label>
+                            {{ form.title(class="input" + (" is-invalid" if form.title.errors else "")) }}
+                            {% for error in form.title.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Company -->
+                        <div>
+                            <label class="label">Company Name *</label>
+                            {{ form.company(class="input" + (" is-invalid" if form.company.errors else "")) }}
+                            {% for error in form.company.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label class="label">Location *</label>
+                            {{ form.location(class="input" + (" is-invalid" if form.location.errors else "")) }}
+                            {% for error in form.location.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Job Type -->
+                        <div>
+                            <label class="label">Job Type *</label>
+                            {{ form.job_type(class="select" + (" is-invalid" if form.job_type.errors else "")) }}
+                            {% for error in form.job_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Experience Level -->
+                        <div>
+                            <label class="label">Experience Level *</label>
+                            {{ form.experience_level(class="select" + (" is-invalid" if form.experience_level.errors else "")) }}
+                            {% for error in form.experience_level.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Details Section -->
+                <div class="bg-card p-8 rounded-lg border border-border shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold">Job Details</h2>
+                            <p class="text-muted-foreground">Detailed description and requirements</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Description -->
+                        <div>
+                            <label class="label">Job Description *</label>
+                            {{ form.description(class="textarea" + (" is-invalid" if form.description.errors else "")) }}
+                            {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Requirements -->
+                        <div>
+                            <label class="label">Requirements *</label>
+                            {{ form.requirements(class="textarea" + (" is-invalid" if form.requirements.errors else "")) }}
+                            {% for error in form.requirements.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Skills -->
+                        <div>
+                            <label class="label">Required Skills *</label>
+                            {{ form.skills(class="input" + (" is-invalid" if form.skills.errors else ""), placeholder="Python, JavaScript, React, Node.js (comma-separated)") }}
+                            {% for error in form.skills.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Salary and Deadline Row -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="label">Salary Range</label>
+                                {{ form.salary_range(class="input" + (" is-invalid" if form.salary_range.errors else ""), placeholder="e.g., $60,000 - $80,000") }}
+                                {% for error in form.salary_range.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div>
+                                <label class="label">Application Deadline *</label>
+                                {{ form.deadline(class="input" + (" is-invalid" if form.deadline.errors else ""), type="date") }}
+                                {% for error in form.deadline.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="bg-card p-8 rounded-lg border border-border shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold">Additional Information</h2>
+                            <p class="text-muted-foreground">Extra details to attract candidates</p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Remote Option -->
+                        <div>
+                            <label class="label">Remote Work Option</label>
+                            <select name="remote_option" class="select">
+                                <option value="">Select option (optional)</option>
+                                <option value="Remote">Fully Remote</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="On-site">On-site Only</option>
+                            </select>
+                        </div>
+
+                        <!-- Benefits -->
+                        <div class="md:col-span-2">
+                            <label class="label">Benefits & Perks</label>
+                            {{ form.benefits(class="textarea" + (" is-invalid" if form.benefits.errors else ""), placeholder="Health insurance, 401k, flexible hours, remote work options, etc.") }}
+                            {% for error in form.benefits.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="bg-card p-6 rounded-lg border border-border shadow-sm">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                        <a href="{{ url_for('jobs.job_board') }}" class="btn-outline px-6 py-3 text-center">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-large px-8 py-3">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                            Post Job
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Job Management - Admin Panel{% endblock %}
+
+{% block content %}
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+                <div>
+                    <!-- Breadcrumb -->
+                    <nav class="breadcrumb mb-4">
+                        <ol class="flex items-center space-x-2">
+                            <li><a href="{{ url_for('admin_dashboard.dashboard') }}" class="text-muted-foreground hover:text-foreground">Admin</a></li>
+                            <li><span class="text-muted-foreground">/</span></li>
+                            <li><span class="text-foreground">Jobs</span></li>
+                        </ol>
+                    </nav>
+
+                    <h1 class="text-3xl font-bold mb-2">Job Management</h1>
+                    <p class="text-muted-foreground">Moderate and manage job postings</p>
+                </div>
+
+                <div class="mt-4 lg:mt-0">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative">
+                            <input type="text" placeholder="Search jobs..." class="input pl-10 pr-4" onkeyup="filterJobs(this.value)">
+                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <select class="select" onchange="filterByStatus(this.value)">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jobs Table -->
+            <div class="bg-card rounded-lg border border-border overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Job</th>
+                                <th>Company</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Posted By</th>
+                                <th>Date</th>
+                                <th>Views</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs.items %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <div class="font-medium line-clamp-1">{{ job.title }}</div>
+                                        {% if job.job_type %}
+                                        <div class="text-xs text-muted-foreground">{{ job.job_type }}</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>{{ job.company }}</td>
+                                <td>{{ job.location }}</td>
+                                <td>
+                                    <span class="badge {% if job.status == 'active' %}badge-success{% else %}badge-secondary{% endif %}">
+                                        {{ job.status.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                                            <span class="text-primary font-semibold text-xs">{{ job.author.username[0]|upper }}</span>
+                                        </div>
+                                        <span class="text-sm">{{ job.author.username }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ job.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="text-sm">{{ job.views_count }}</span>
+                                </td>
+                                <td>
+                                    <div class="flex space-x-2">
+                                        <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn-icon-small" title="View">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
+
+                                        <form method="POST" action="{{ url_for('admin_dashboard.toggle_job_status', job_id=job.id) }}" class="inline"
+                                              onsubmit="return confirm('Are you sure you want to {% if job.status == "active" %}deactivate{% else %}activate{% endif %} this job?')">
+                                            <button type="submit" class="btn-icon-small" title="{% if job.status == 'active' %}Deactivate{% else %}Activate{% endif %}">
+                                                {% if job.status == 'active' %}
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                </svg>
+                                                {% else %}
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if jobs.pages > 1 %}
+                <div class="p-4 border-t border-border">
+                    <nav class="pagination" aria-label="Jobs pagination">
+                        {% if jobs.has_prev %}
+                        <a href="{{ url_for('admin_dashboard.manage_jobs', page=jobs.prev_num) }}" class="btn-outline">
+                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Previous
+                        </a>
+                        {% else %}
+                        <span class="btn-outline disabled">Previous</span>
+                        {% endif %}
+
+                        <div class="flex items-center space-x-1">
+                            {% for page_num in jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                            {% if page_num == jobs.page %}
+                            <span class="btn-outline active" aria-current="page">{{ page_num }}</span>
+                            {% else %}
+                            <a href="{{ url_for('admin_dashboard.manage_jobs', page=page_num) }}" class="btn-outline">{{ page_num }}</a>
+                            {% endif %}
+                            {% else %}
+                            <span class="btn-outline disabled">...</span>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {% if jobs.has_next %}
+                        <a href="{{ url_for('admin_dashboard.manage_jobs', page=jobs.next_num) }}" class="btn-outline">
+                            Next
+                            <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        {% else %}
+                        <span class="btn-outline disabled">Next</span>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Job Stats -->
+            <div class="mt-8 grid md:grid-cols-4 gap-6">
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-primary mb-2">{{ jobs.total }}</div>
+                    <div class="text-muted-foreground">Total Jobs</div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">{{ jobs.items|selectattr('status', 'equalto', 'active')|list|length }}</div>
+                    <div class="text-muted-foreground">Active Jobs</div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">{{ jobs.items|selectattr('status', 'equalto', 'inactive')|list|length }}</div>
+                    <div class="text-muted-foreground">Inactive Jobs</div>
+                </div>
+
+                <div class="bg-card p-6 rounded-lg border border-border text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">{{ jobs.items|sum(attribute='views_count') }}</div>
+                    <div class="text-muted-foreground">Total Views</div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

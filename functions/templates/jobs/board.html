@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Job Board - OpenJobs{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold mb-2">Job Board</h1>
+                        <p class="text-muted-foreground">Discover your next career opportunity</p>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                    <div class="mt-4 lg:mt-0">
+                        <a href="{{ url_for('jobs.create_job') }}" class="btn btn-large">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Post New Job
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="bg-card p-6 rounded-lg border border-border mb-8">
+                    <form method="GET" class="space-y-4">
+                        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Search Input -->
+                            <div>
+                                <label class="label mb-2">Search Jobs</label>
+                                <div class="relative">
+                                    <input type="text" name="q" value="{{ request.args.get('q', '') }}"
+                                           placeholder="Job title, company, skills..."
+                                           class="input pl-10 pr-4 w-full">
+                                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Location Filter -->
+                            <div>
+                                <label class="label mb-2">Location</label>
+                                <input type="text" name="location" value="{{ request.args.get('location', '') }}"
+                                       placeholder="City, State, or Remote"
+                                       class="input">
+                            </div>
+
+                            <!-- Job Type Filter -->
+                            <div>
+                                <label class="label mb-2">Job Type</label>
+                                <select name="type" class="select">
+                                    <option value="">All Types</option>
+                                    <option value="Full-time" {% if request.args.get('type') == 'Full-time' %}selected{% endif %}>Full-time</option>
+                                    <option value="Part-time" {% if request.args.get('type') == 'Part-time' %}selected{% endif %}>Part-time</option>
+                                    <option value="Contract" {% if request.args.get('type') == 'Contract' %}selected{% endif %}>Contract</option>
+                                    <option value="Internship" {% if request.args.get('type') == 'Internship' %}selected{% endif %}>Internship</option>
+                                </select>
+                            </div>
+
+                            <!-- Experience Level Filter -->
+                            <div>
+                                <label class="label mb-2">Experience</label>
+                                <select name="experience" class="select">
+                                    <option value="">All Levels</option>
+                                    <option value="Entry" {% if request.args.get('experience') == 'Entry' %}selected{% endif %}>Entry Level</option>
+                                    <option value="Mid" {% if request.args.get('experience') == 'Mid' %}selected{% endif %}>Mid Level</option>
+                                    <option value="Senior" {% if request.args.get('experience') == 'Senior' %}selected{% endif %}>Senior Level</option>
+                                    <option value="Lead" {% if request.args.get('experience') == 'Lead' %}selected{% endif %}>Lead</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                            <a href="{{ url_for('jobs.job_board') }}" class="btn-outline">Clear Filters</a>
+                            <button type="submit" class="btn">Apply Filters</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <div class="mb-4 sm:mb-0">
+                        <p class="text-muted-foreground">
+                            {% if jobs.total > 0 %}
+                                Showing {{ ((jobs.page - 1) * jobs.per_page) + 1 }} - {{ ((jobs.page - 1) * jobs.per_page) + jobs.items|length }} of {{ jobs.total }} jobs
+                            {% else %}
+                                No jobs found
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-muted-foreground">Sort by:</span>
+                        <select class="select" onchange="window.location.href=this.value">
+                            <option value="{{ url_for('jobs.job_board', page=jobs.page, **request.args) }}" selected>Latest</option>
+                            <option value="{{ url_for('jobs.job_board', page=jobs.page, sort='oldest', **request.args) }}">Oldest</option>
+                            <option value="{{ url_for('jobs.job_board', page=jobs.page, sort='salary_high', **request.args) }}">Salary (High to Low)</option>
+                            <option value="{{ url_for('jobs.job_board', page=jobs.page, sort='salary_low', **request.args) }}">Salary (Low to High)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Job Listings -->
+                {% if jobs.items %}
+                <div class="space-y-4 mb-8">
+                    {% for job in jobs.items %}
+                    <div class="card hover:shadow-md transition-all duration-200 group">
+                        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+                            <div class="flex-1 mb-4 lg:mb-0">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-semibold mb-1 group-hover:text-primary transition-colors">
+                                            <a href="{{ url_for('jobs.view_job', job_id=job.id) }}">{{ job.title }}</a>
+                                        </h3>
+                                        <p class="text-muted-foreground mb-2">{{ job.company }}</p>
+                                        <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                {{ job.location }}
+                                            </div>
+                                            {% if job.salary_range %}
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                                </svg>
+                                                {{ job.salary_range }}
+                                            </div>
+                                            {% endif %}
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                                {{ job.created_at.strftime('%b %d, %Y') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-start sm:items-end space-y-2">
+                                        <span class="badge badge-success">{{ job.job_type }}</span>
+                                        {% if job.remote_option %}
+                                        <span class="badge ">{{ job.remote_option }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <p class="text-muted-foreground mb-3 line-clamp-2">{{ job.description }}</p>
+
+                                {% if job.skills %}
+                                <div class="flex flex-wrap gap-1 mb-3">
+                                    {% for skill in job.skills.split(',')[:4] %}
+                                    <span class="badge badge-secondary text-xs">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                    {% if job.skills.split(',')|length > 4 %}
+                                    <span class="badge badge-secondary text-xs">+{{ job.skills.split(',')|length - 4 }} more</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-3 lg:ml-6">
+                                <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn btn-small flex-1 sm:flex-none">
+                                    View Details
+                                </a>
+                                {% if current_user.is_authenticated and current_user.id == job.user_id %}
+                                <a href="{{ url_for('jobs.edit_job', job_id=job.id) }}" class="btn-outline btn-small flex-1 sm:flex-none">
+                                    Edit
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if jobs.pages > 1 %}
+                <nav class="pagination" aria-label="Job listings pagination">
+                    {% if jobs.has_prev %}
+                    <a href="{{ url_for('jobs.job_board', page=jobs.prev_num, **request.args) }}" class="btn-outline">
+                        <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Previous
+                    </a>
+                    {% else %}
+                    <span class="btn-outline disabled">Previous</span>
+                    {% endif %}
+
+                    <div class="flex items-center space-x-1">
+                        {% for page_num in jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                        {% if page_num == jobs.page %}
+                        <span class="btn-outline active" aria-current="page">{{ page_num }}</span>
+                        {% else %}
+                        <a href="{{ url_for('jobs.job_board', page=page_num, **request.args) }}" class="btn-outline">{{ page_num }}</a>
+                        {% endif %}
+                        {% else %}
+                        <span class="btn-outline disabled">...</span>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {% if jobs.has_next %}
+                    <a href="{{ url_for('jobs.job_board', page=jobs.next_num, **request.args) }}" class="btn-outline">
+                        Next
+                        <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    {% else %}
+                    <span class="btn-outline disabled">Next</span>
+                    {% endif %}
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <!-- No Jobs Found -->
+                <div class="text-center py-16">
+                    <div class="max-w-md mx-auto">
+                        <svg class="w-24 h-24 mx-auto text-muted-foreground/50 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <h3 class="text-2xl font-semibold mb-4">No Jobs Found</h3>
+                        <p class="text-muted-foreground mb-6">
+                            {% if request.args %}
+                                Try adjusting your search criteria or browse all available jobs.
+                            {% else %}
+                                No jobs are currently available. Be the first to post a job opportunity!
+                            {% endif %}
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            {% if request.args %}
+                            <a href="{{ url_for('jobs.job_board') }}" class="btn">View All Jobs</a>
+                            {% endif %}
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('jobs.create_job') }}" class="btn-outline">Post a Job</a>
+                            {% else %}
+                            <a href="{{ url_for('register') }}" class="btn-outline">Join to Post Jobs</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

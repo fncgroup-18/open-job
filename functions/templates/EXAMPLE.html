@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basecoat Demo Website</title>
+    <!-- Basecoat CSS CDN Setup -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.1/dist/basecoat.cdn.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.1/dist/js/all.min.js" defer></script>
+</head>
+<body class="bg-background text-foreground">
+    <!-- Header with theme switcher -->
+    <header class="bg-card border-b border-border p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-card-foreground">Basecoat Demo</h1>
+            <!-- Theme Toggle Button -->
+            <button onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))" 
+                    class="btn-icon-outline" title="Toggle theme">
+                <svg class="w-4 h-4 dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                <svg class="w-4 h-4 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6 space-y-8">
+        <!-- Welcome Section -->
+        <section class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Welcome to Basecoat Demo</h2>
+            <p class="text-muted-foreground mb-6">A beautiful, responsive UI component library with dark mode support.</p>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="btn">Primary Action</button>
+                <button class="btn-secondary">Secondary Action</button>
+                <button class="btn-outline">Outline Button</button>
+                <button class="btn-ghost">Ghost Button</button>
+            </div>
+        </section>
+
+        <!-- Form Section -->
+        <section class="max-w-md mx-auto">
+            <div class="card">
+                <header>
+                    <h2 class="text-xl font-semibold">Contact Form</h2>
+                </header>
+                <section class="space-y-4">
+                    <div class="grid gap-2">
+                        <label for="name" class="label">Full Name</label>
+                        <input class="input" id="name" type="text" placeholder="Enter your name">
+                    </div>
+                    
+                    <div class="grid gap-2">
+                        <label for="email" class="label">Email Address</label>
+                        <input class="input" id="email" type="email" placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="grid gap-2">
+                        <label for="message" class="label">Message</label>
+                        <textarea class="input" id="message" rows="3" placeholder="Enter your message"></textarea>
+                    </div>
+                </section>
+                <footer class="pt-4">
+                    <button class="btn w-full">Send Message</button>
+                </footer>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-6">Features</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature Card 1 -->
+                <div class="card">
+                    <header class="pb-2">
+                        <h3 class="text-lg font-semibold">Responsive Design</h3>
+                    </header>
+                    <section>
+                        <p class="text-muted-foreground">Works perfectly on all devices and screen sizes.</p>
+                    </section>
+                </div>
+
+                <!-- Feature Card 2 -->
+                <div class="card">
+                    <header class="pb-2">
+                        <h3 class="text-lg font-semibold">Dark Mode</h3>
+                    </header>
+                    <section>
+                        <p class="text-muted-foreground">Seamless dark and light theme switching.</p>
+                    </section>
+                </div>
+
+                <!-- Feature Card 3 -->
+                <div class="card">
+                    <header class="pb-2">
+                        <h3 class="text-lg font-semibold">Accessible</h3>
+                    </header>
+                    <section>
+                        <p class="text-muted-foreground">Built with accessibility in mind for all users.</p>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alert Examples -->
+        <section class="space-y-4">
+            <h2 class="text-2xl font-bold text-center mb-6">Alert Examples</h2>
+            
+            <!-- Success Alert -->
+            <div class="alert">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2>Success!</h2>
+                <section>Operation completed successfully.</section>
+            </div>
+
+            <!-- Error Alert -->
+            <div class="alert-destructive">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <h2>Error!</h2>
+                <section>Something went wrong. Please try again.</section>
+            </div>
+
+            <!-- Info Alert (using success styling) -->
+            <div class="alert">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2>Information</h2>
+                <section>This is an informational message to help users.</section>
+            </div>
+        <!-- Complete Button Variants Section -->
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-6">Complete Button Collection</h2>
+            <div class="flex flex-wrap gap-3 justify-center mb-6">
+                <button class="btn">Primary</button>
+                <button class="btn-secondary">Secondary</button>
+                <button class="btn-outline">Outline</button>
+                <button class="btn-ghost">Ghost</button>
+                <button class="btn-destructive">Destructive</button>
+                <button class="btn-link">Link</button>
+            </div>
+            <div class="flex flex-wrap gap-3 justify-center mb-6">
+                <button class="btn-small">Small</button>
+                <button class="btn">Default</button>
+                <button class="btn-large">Large</button>
+            </div>
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button class="btn-icon">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </button>
+                <button class="btn-icon-large">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- Form Elements Section -->
+        <section class="max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-center mb-6">Advanced Form Elements</h2>
+            
+            <!-- Select Dropdowns -->
+            <div class="grid gap-4 mb-8">
+                <div class="grid gap-2">
+                    <label class="label">Native Select</label>
+                    <select class="select">
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                        <option value="3">Option 3</option>
+                    </select>
+                </div>
+                
+                <div class="grid gap-2">
+                    <label class="label">Custom Styled Select</label>
+                    <select class="select-custom">
+                        <option value="1">Styled Option 1</option>
+                        <option value="2">Styled Option 2</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Slider -->
+            <div class="grid gap-2 mb-8">
+                <label class="label">Volume Control</label>
+                <input type="range" class="slider" min="0" max="100" value="75">
+            </div>
+            
+            <!-- Form Container -->
+            <div class="form-container">
+                <h3 class="text-lg font-semibold mb-4">Grouped Form Fields</h3>
+                <div class="grid gap-4">
+                    <div class="grid gap-2">
+                        <label class="label">Username</label>
+                        <input class="input" placeholder="Enter username">
+                    </div>
+                    <div class="grid gap-2">
+                        <label class="label">Email</label>
+                        <input class="input" type="email" placeholder="Enter email">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Components -->
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-6">Navigation Components</h2>
+            
+            <!-- Tabs -->
+            <div class="tabs mb-8" id="demo-tabs">
+                <nav role="tablist" aria-orientation="horizontal" class="border-b">
+                    <button type="button" role="tab" aria-selected="true" aria-controls="panel-1" 
+                            class="px-4 py-2 border-b-2 border-primary text-primary">
+                        Dashboard
+                    </button>
+                    <button type="button" role="tab" aria-selected="false" aria-controls="panel-2" 
+                            class="px-4 py-2 border-b-2 border-transparent hover:border-muted">
+                        Profile
+                    </button>
+                    <button type="button" role="tab" aria-selected="false" aria-controls="panel-3" 
+                            class="px-4 py-2 border-b-2 border-transparent hover:border-muted">
+                        Settings
+                    </button>
+                </nav>
+                
+                <div role="tabpanel" id="panel-1" aria-selected="true" class="p-4">
+                    <h3 class="text-lg font-medium">Dashboard Overview</h3>
+                    <p>Welcome to your dashboard. Here you can see all your important information.</p>
+                </div>
+                
+                <div role="tabpanel" id="panel-2" aria-selected="false" class="p-4" hidden>
+                    <h3 class="text-lg font-medium">User Profile</h3>
+                    <p>Manage your profile settings and preferences.</p>
+                </div>
+                
+                <div role="tabpanel" id="panel-3" aria-selected="false" class="p-4" hidden>
+                    <h3 class="text-lg font-medium">Application Settings</h3>
+                    <p>Configure how the application behaves.</p>
+                </div>
+            </div>
+            
+            <!-- Accordion -->
+            <section class="accordion mb-8">
+                <details class="group border-b last:border-b-0">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer">
+                        <h3>Getting Started</h3>
+                        <svg class="w-4 h-4 transition-transform group-open:rotate-180" 
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </summary>
+                    <section class="p-4 pt-0">
+                        <p>Learn the basics of using Basecoat components and setting up your project.</p>
+                    </section>
+                </details>
+                
+                <details class="group border-b last:border-b-0">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer">
+                        <h3>Component Library</h3>
+                        <svg class="w-4 h-4 transition-transform group-open:rotate-180" 
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </summary>
+                    <section class="p-4 pt-0">
+                        <p>Explore all available components including forms, navigation, feedback, and more.</p>
+                    </section>
+                </details>
+            </section>
+            
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumb mb-8">
+                <ol class="flex items-center space-x-2">
+                    <li><a href="#" class="text-muted-foreground hover:text-foreground">Home</a></li>
+                    <li><span class="text-muted-foreground">/</span></li>
+                    <li><a href="#" class="text-muted-foreground hover:text-foreground">Components</a></li>
+                    <li><span class="text-muted-foreground">/</span></li>
+                    <li><span class="text-foreground">Demo</span></li>
+                </ol>
+            </nav>
+        </section>
+
+        <!-- Interactive Components -->
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-6">Interactive Components</h2>
+            
+            <!-- Tooltips -->
+            <div class="flex flex-wrap gap-4 justify-center mb-8">
+                <button class="btn-outline" data-tooltip="This is a helpful tooltip">Hover me</button>
+                <button class="btn-outline" data-tooltip="Right side tooltip" data-side="right">Right tooltip</button>
+                <button class="btn-outline" data-tooltip="Bottom aligned tooltip" data-side="bottom" data-align="start">Bottom tooltip</button>
+            </div>
+            
+            <!-- Toast Notifications (Demo) -->
+            <div class="flex flex-wrap gap-3 justify-center mb-8">
+                <button class="btn" onclick="showToast('success', 'Success! Operation completed.')">Show Success Toast</button>
+                <button class="btn-destructive" onclick="showToast('error', 'Error! Something went wrong.')">Show Error Toast</button>
+            </div>
+        </section>
+
+        <!-- Layout Components -->
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-6">Layout Components</h2>
+            
+            <!-- Skeleton Loading States -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-profile mb-4"></div>
+                    <div class="skeleton h-4 mb-2"></div>
+                    <div class="skeleton h-4 w-3/4"></div>
+                </div>
+                
+                <div class="skeleton-card">
+                    <div class="skeleton h-32 mb-4"></div>
+                    <div class="skeleton h-4 mb-2"></div>
+                    <div class="skeleton h-4 mb-2"></div>
+                    <div class="skeleton h-4 w-2/3"></div>
+                </div>
+            </div>
+            
+            <!-- Table -->
+            <div class="table-container mb-8">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>john@example.com</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>
+                                <button class="btn-icon-small">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>jane@example.com</td>
+                            <td><span class="badge badge-secondary">Inactive</span></td>
+                            <td>
+                                <button class="btn-icon-small">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav class="pagination" aria-label="Pagination navigation">
+                <button class="btn-outline" disabled>Previous</button>
+                <button class="btn-outline" aria-current="page">1</button>
+                <button class="btn-outline">2</button>
+                <button class="btn-outline">3</button>
+                <button class="btn-outline">Next</button>
+            </nav>
+        </section>
+
+        <!-- Dialog/Modal Examples -->
+        <section class="text-center">
+            <h2 class="text-2xl font-bold mb-6">Dialog Examples</h2>
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="btn" onclick="document.getElementById('alert-dialog').showModal()">Show Alert Dialog</button>
+                <button class="btn-secondary" onclick="document.getElementById('modal-dialog').showModal()">Show Modal Dialog</button>
+            </div>
+        </section>
+            <h2 class="text-2xl font-bold mb-6">Interactive Elements</h2>
+            
+            <!-- Checkbox and Radio -->
+            <div class="max-w-md mx-auto space-y-4">
+                <div class="grid gap-2">
+                    <label class="label">Select Options</label>
+                    <div class="space-y-2">
+                        <label class="checkbox">
+                            <input type="checkbox" checked>
+                            <span class="checkmark"></span>
+                            Option 1
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            Option 2
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid gap-2">
+                    <label class="label">Choose One</label>
+                    <div class="space-y-2">
+                        <label class="radio">
+                            <input type="radio" name="choice" checked>
+                            <span class="radiomark"></span>
+                            Choice A
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="choice">
+                            <span class="radiomark"></span>
+                            Choice B
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+<!-- Alert Dialog -->
+<dialog class="dialog" id="alert-dialog" aria-labelledby="alert-title" aria-describedby="alert-description">
+    <article>
+        <header>
+            <h2 id="alert-title">Confirmation Required</h2>
+            <p id="alert-description">Are you sure you want to delete this item? This action cannot be undone.</p>
+        </header>
+        <footer>
+            <button class="btn-outline" onclick="document.getElementById('alert-dialog').close()">Cancel</button>
+            <button class="btn-destructive" onclick="confirmDelete()">Delete</button>
+        </footer>
+    </article>
+</dialog>
+
+<!-- Modal Dialog -->
+<dialog id="modal-dialog" class="dialog" aria-labelledby="modal-title" aria-describedby="modal-description">
+    <article>
+        <header>
+            <h2 id="modal-title">Edit Profile</h2>
+            <p id="modal-description">Update your profile information</p>
+            <button onclick="document.getElementById('modal-dialog').close()" class="btn-icon absolute top-4 right-4">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
+        <section>
+            <form class="form grid gap-4">
+                <div class="grid gap-2">
+                    <label for="edit-name" class="label">Name</label>
+                    <input type="text" id="edit-name" class="input" placeholder="Enter name" value="John Doe">
+                </div>
+                <div class="grid gap-2">
+                    <label for="edit-email" class="label">Email</label>
+                    <input type="email" id="edit-email" class="input" placeholder="Enter email" value="john@example.com">
+                </div>
+            </form>
+        </section>
+        <footer>
+            <button onclick="document.getElementById('modal-dialog').close()" class="btn-outline">Cancel</button>
+            <button class="btn" onclick="saveProfile()">Save Changes</button>
+        </footer>
+    </article>
+</dialog>
+    <footer class="bg-card border-t border-border p-6 mt-12">
+        <div class="container mx-auto text-center">
+            <p class="text-muted-foreground">Built with Basecoat UI components</p>
+        </div>
+    </footer>
+
+<script>
+// Toast notification system
+function showToast(type, message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    
+    toast.className = `toast toast-${type} flex items-center gap-3 p-4 rounded-lg shadow-lg`;
+    toast.innerHTML = `
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="btn-icon ml-auto">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+function confirmDelete() {
+    showToast('success', 'Item deleted successfully!');
+    document.getElementById('alert-dialog').close();
+}
+
+function saveProfile() {
+    showToast('success', 'Profile updated successfully!');
+    document.getElementById('modal-dialog').close();
+}
+
+// Tab functionality
+const tabs = document.querySelectorAll('[role="tab"]');
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        // Hide all panels
+        document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+            panel.hidden = true;
+        });
+        
+        // Remove active state from all tabs
+        tabs.forEach(t => {
+            t.classList.remove('border-primary', 'text-primary');
+            t.classList.add('border-transparent');
+            t.setAttribute('aria-selected', 'false');
+        });
+        
+        // Show selected panel
+        const targetPanel = document.getElementById(tab.getAttribute('aria-controls'));
+        if (targetPanel) {
+            targetPanel.hidden = false;
+        }
+        
+        // Set active state on clicked tab
+        tab.classList.remove('border-transparent');
+        tab.classList.add('border-primary', 'text-primary');
+        tab.setAttribute('aria-selected', 'true');
+    });
+});
+
+// Theme Switcher Script
+(() => {
+  try {
+    const stored = localStorage.getItem('themeMode');
+    if (stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (_) {}
+  
+  document.addEventListener('basecoat:theme', (e) => {
+    const mode = e.detail?.mode || (document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('themeMode', mode);
+  });
+})();
+</script>
+</body>
+</html>

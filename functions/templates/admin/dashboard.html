@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - OpenJobs{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-8">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold mb-2">Admin Dashboard</h1>
+                <p class="text-muted-foreground">Platform overview and management tools</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Users -->
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold">{{ stats.total_users }}</div>
+                            <div class="text-muted-foreground">Total Users</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Jobs -->
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold">{{ stats.total_jobs }}</div>
+                            <div class="text-muted-foreground">Total Jobs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Jobs -->
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold">{{ stats.active_jobs }}</div>
+                            <div class="text-muted-foreground">Active Jobs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Health -->
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-green-600">Healthy</div>
+                            <div class="text-muted-foreground">Platform Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Recent Users -->
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                            </svg>
+                            Recent Users
+                        </h2>
+                        <a href="{{ url_for('admin_dashboard.manage_users') }}" class="btn btn-small">View All</a>
+                    </div>
+
+                    {% if recent_users %}
+                    <div class="space-y-3">
+                        {% for user in recent_users %}
+                        <div class="flex items-center justify-between p-3 rounded-lg border border-border/50">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                                    <span class="text-primary font-semibold text-sm">{{ user.username[0]|upper }}</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium">{{ user.username }}</p>
+                                    <p class="text-sm text-muted-foreground">{{ user.email }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge {% if user.is_active %}badge-success{% else %}badge-secondary{% endif %} text-xs">
+                                    {{ 'Active' if user.is_active else 'Inactive' }}
+                                </span>
+                                {% if user.is_admin %}
+                                <span class="badge badge-primary text-xs ml-2">Admin</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted-foreground text-center py-4">No users found</p>
+                    {% endif %}
+                </div>
+
+                <!-- Recent Jobs -->
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+                            </svg>
+                            Recent Jobs
+                        </h2>
+                        <a href="{{ url_for('admin_dashboard.manage_jobs') }}" class="btn btn-small">View All</a>
+                    </div>
+
+                    {% if recent_jobs %}
+                    <div class="space-y-3">
+                        {% for job in recent_jobs %}
+                        <div class="flex items-center justify-between p-3 rounded-lg border border-border/50">
+                            <div class="flex-1">
+                                <p class="font-medium line-clamp-1">{{ job.title }}</p>
+                                <p class="text-sm text-muted-foreground">{{ job.company }} • {{ job.location }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge {% if job.status == 'active' %}badge-success{% else %}badge-secondary{% endif %} text-xs">
+                                    {{ job.status.title() }}
+                                </span>
+                                <p class="text-xs text-muted-foreground mt-1">{{ job.views_count }} views</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted-foreground text-center py-4">No jobs found</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mt-8">
+                <div class="bg-card p-6 rounded-lg border border-border">
+                    <h2 class="text-xl font-bold mb-6 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Quick Actions
+                    </h2>
+
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <a href="{{ url_for('admin_dashboard.manage_users') }}" class="card hover:shadow-lg transition-all duration-200 group cursor-pointer">
+                            <div class="flex flex-col items-center justify-center p-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                    </svg>
+                                </div>
+                                <span class="font-medium text-center">Manage Users</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ url_for('admin_dashboard.manage_jobs') }}" class="card hover:shadow-lg transition-all duration-200 group cursor-pointer">
+                            <div class="flex flex-col items-center justify-center p-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+                                    </svg>
+                                </div>
+                                <span class="font-medium text-center">Manage Jobs</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ url_for('index') }}" class="card hover:shadow-lg transition-all duration-200 group cursor-pointer">
+                            <div class="flex flex-col items-center justify-center p-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </div>
+                                <span class="font-medium text-center">View Site</span>
+                            </div>
+                        </a>
+
+                        <button onclick="refreshStats()" class="card hover:shadow-lg transition-all duration-200 group cursor-pointer">
+                            <div class="flex flex-col items-center justify-center p-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                </div>
+                                <span class="font-medium text-center">Refresh Stats</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

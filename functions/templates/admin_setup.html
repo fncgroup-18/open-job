@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Setup - OpenJobs{% endblock %}
+
+{% block content %}
+        <div class="container mx-auto px-4">
+            <div class="max-w-md mx-auto">
+                <!-- Setup Card -->
+                <div class="card">
+                    <header class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold mb-2">Admin Setup Required</h1>
+                        <p class="text-muted-foreground">Create the first administrator account to get started</p>
+                    </header>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert {% if category == 'error' %}alert-destructive{% else %}alert{% endif %} mb-4">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        {% if category == 'error' %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        {% else %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        {% endif %}
+                                    </svg>
+                                    <h2>{% if category == 'error' %}Error{% else %}Success{% endif %}!</h2>
+                                    <section>{{ message }}</section>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" class="space-y-4">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Full Name -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.name.id }}" class="label">Full Name *</label>
+                            {{ form.name(class="input" + (" is-invalid" if form.name.errors else "")) }}
+                            {% for error in form.name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Username -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.username.id }}" class="label">Username *</label>
+                            {{ form.username(class="input" + (" is-invalid" if form.username.errors else "")) }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.email.id }}" class="label">Email Address *</label>
+                            {{ form.email(class="input" + (" is-invalid" if form.email.errors else "")) }}
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.password.id }}" class="label">Password *</label>
+                            {{ form.password(class="input" + (" is-invalid" if form.password.errors else "")) }}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <p class="text-xs text-muted-foreground">Must be at least 12 characters with letters, numbers, and special characters</p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn w-full btn-large">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            Create Admin Account
+                        </button>
+                    </form>
+
+                    <footer class="pt-6 border-t border-border text-center">
+                        <p class="text-sm text-muted-foreground">
+                            This is a one-time setup. You'll be redirected to the login page after creating the admin account.
+                        </p>
+                    </footer>
+                </div>
+
+                <!-- Setup Information -->
+                <div class="mt-8 bg-card p-6 rounded-lg border border-border">
+                    <h3 class="text-lg font-semibold mb-4 text-center">What happens next?</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="text-primary font-semibold text-xs">1</span>
+                            </div>
+                            <p class="text-muted-foreground">Admin account is created with full platform access</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="text-primary font-semibold text-xs">2</span>
+                            </div>
+                            <p class="text-muted-foreground">You'll be redirected to the admin login page</p>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="text-primary font-semibold text-xs">3</span>
+                            </div>
+                            <p class="text-muted-foreground">Access the admin dashboard to manage the platform</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

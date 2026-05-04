@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Join OpenJobs - Create Your Account{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-md mx-auto">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb mb-8">
+                    <ol class="flex items-center space-x-2">
+                        <li><a href="{{ url_for('index') }}" class="text-muted-foreground hover:text-foreground">Home</a></li>
+                        <li><span class="text-muted-foreground">/</span></li>
+                        <li><span class="text-foreground">Register</span></li>
+                    </ol>
+                </nav>
+
+                <!-- Registration Card -->
+                <div class="card">
+                    <header class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold mb-2">Create Your Account</h1>
+                        <p class="text-muted-foreground">Join OpenJobs and start your career journey today</p>
+                    </header>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert {% if category == 'error' %}alert-destructive{% else %}alert{% endif %} mb-4">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        {% if category == 'error' %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        {% else %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        {% endif %}
+                                    </svg>
+                                    <h2>{% if category == 'error' %}Error{% else %}Success{% endif %}!</h2>
+                                    <section>{{ message }}</section>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" class="space-y-4">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Full Name -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.name.id }}" class="label">Full Name *</label>
+                            {{ form.name(class="input" + (" is-invalid" if form.name.errors else "")) }}
+                            {% for error in form.name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Username -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.username.id }}" class="label">Username *</label>
+                            {{ form.username(class="input" + (" is-invalid" if form.username.errors else "")) }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.email.id }}" class="label">Email Address *</label>
+                            {{ form.email(class="input" + (" is-invalid" if form.email.errors else "")) }}
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="grid gap-2">
+                            <label for="{{ form.password.id }}" class="label">Password *</label>
+                            {{ form.password(class="input" + (" is-invalid" if form.password.errors else "")) }}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <p class="text-xs text-muted-foreground">Must be at least 8 characters long</p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn w-full btn-large">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            Create Account
+                        </button>
+                    </form>
+
+                    <footer class="pt-6 border-t border-border text-center">
+                        <p class="text-sm text-muted-foreground">
+                            Already have an account?
+                            <a href="{{ url_for('login') }}" class="text-primary hover:underline font-medium">Sign in here</a>
+                        </p>
+                    </footer>
+                </div>
+
+                <!-- Benefits Section -->
+                <div class="mt-8 bg-card p-6 rounded-lg border border-border">
+                    <h3 class="text-lg font-semibold mb-4 text-center">Why Join OpenJobs?</h3>
+                    <div class="grid md:grid-cols-3 gap-4 text-center">
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-medium">Find Jobs Fast</h4>
+                            <p class="text-sm text-muted-foreground">Advanced search and filters to find your perfect match</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-medium">Easy Application</h4>
+                            <p class="text-sm text-muted-foreground">Apply to jobs with just one click</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5h5m-5-5v5h5"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-medium">Track Progress</h4>
+                            <p class="text-sm text-muted-foreground">Monitor your applications and get notified</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

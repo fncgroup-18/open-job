@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - OpenJobs{% endblock %}
+
+{% block content %}
+    <!-- Main Content -->
+    <main class="min-h-screen py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-md mx-auto">
+                <!-- Admin Login Card -->
+                <div class="card">
+                    <header class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold mb-2">Admin Access</h1>
+                        <p class="text-muted-foreground">Sign in to access the admin dashboard</p>
+                    </header>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert {% if category == 'error' %}alert-destructive{% else %}alert{% endif %} mb-4">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        {% if category == 'error' %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        {% else %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        {% endif %}
+                                    </svg>
+                                    <h2>{% if category == 'error' %}Error{% else %}Success{% endif %}!</h2>
+                                    <section>{{ message }}</section>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" class="space-y-4">
+                        <!-- Email -->
+                        <div class="grid gap-2">
+                            <label for="email" class="label">Admin Email *</label>
+                            <input type="email" id="email" name="email" class="input" placeholder="admin@openjobs.com" required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="grid gap-2">
+                            <label for="password" class="label">Password *</label>
+                            <input type="password" id="password" name="password" class="input" required>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn w-full btn-large">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            Access Admin Dashboard
+                        </button>
+                    </form>
+
+                    <footer class="pt-6 border-t border-border text-center">
+                        <p class="text-sm text-muted-foreground">
+                            <a href="{{ url_for('login') }}" class="text-primary hover:underline font-medium">Back to User Login</a>
+                        </p>
+                    </footer>
+                </div>
+
+                <!-- Admin Features -->
+                <div class="mt-8 bg-card p-6 rounded-lg border border-border">
+                    <h3 class="text-lg font-semibold mb-4 text-center">Admin Capabilities</h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-center">
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-medium">User Management</h4>
+                            <p class="text-sm text-muted-foreground">Manage user accounts and permissions</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-medium">Job Moderation</h4>
+                            <p class="text-sm text-muted-foreground">Review and moderate job postings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

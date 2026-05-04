@@ -1,0 +1,8 @@
+firebase-functions>=0.1.0
+firebase-admin>=6.0.0
+Flask>=2.3.0
+Flask-WTF>=1.1.0
+Flask-Bcrypt>=1.0.0
+Flask-Login>=0.6.0
+WTForms>=3.0.0
+email-validator>=2.0.0
