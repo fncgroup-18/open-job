@@ -108,7 +108,7 @@ def toggle_user_status(user_id):
         db.session.commit()
         status = 'activated' if user.is_active else 'deactivated'
         flash(f'✨ User {user.username} has been {status}.', 'success')
-    return redirect(url_for('admin.manage_users'))
+    return redirect(url_for('admin_dashboard.manage_users'))
 
 @admin.route('/jobs/<int:job_id>/toggle-status', methods=['POST'])
 @admin_required
@@ -118,4 +118,4 @@ def toggle_job_status(job_id):
     job.status = 'active' if job.status == 'inactive' else 'inactive'
     db.session.commit()
     flash(f'✨ Job "{job.title}" status updated to {job.status}.', 'success')
-    return redirect(url_for('admin.manage_jobs'))
+    return redirect(url_for('admin_dashboard.manage_jobs'))
