@@ -3,37 +3,66 @@ import requests
 from datetime import datetime
 
 RAPIDAPI_KEY = os.getenv('RAPIDAPI_KEY', '')
-_HOST = "jsearch.p.rapidapi.com"
+_HOST = "linkedin-job-search-api.p.rapidapi.com"
+_BASE = f"https://{_HOST}"
 
 _TYPE_MAP = {
-    'FULLTIME': 'Full-time',
-    'PARTTIME': 'Part-time',
-    'CONTRACTOR': 'Contract',
-    'INTERN': 'Internship',
+    'full-time': 'Full-time', 'fulltime': 'Full-time',
+    'part-time': 'Part-time', 'parttime': 'Part-time',
+    'contract': 'Contract', 'contractor': 'Contract',
+    'internship': 'Internship', 'intern': 'Internship',
+    'temporary': 'Contract', 'volunteer': 'Part-time',
+}
+
+_LEVEL_MAP = {
+    'entry': 'Entry', 'entry level': 'Entry', 'junior': 'Entry', 'associate': 'Entry',
+    'mid': 'Mid', 'mid-senior level': 'Mid', 'mid level': 'Mid',
+    'senior': 'Senior', 'director': 'Senior', 'executive': 'Senior', 'manager': 'Senior',
 }
 
 
-def search_jobs(query, location='', num_pages=1, date_posted='month'):
+def search_jobs(title_filter, location_filter='United Kingdom', offset=0):
+    """Search LinkedIn jobs via the linkedin-job-search-api on RapidAPI."""
     if not RAPIDAPI_KEY:
         raise ValueError("RAPIDAPI_KEY not configured.")
 
-    search_q = f"{query} in {location}" if location else query
     try:
         resp = requests.get(
-            "https://jsearch.p.rapidapi.com/search",
-            headers={"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": _HOST},
-            params={"query": search_q, "page": "1", "num_pages": str(num_pages),
-                    "date_posted": date_posted},
-            timeout=15,
+            f"{_BASE}/active-jb-1h",
+            headers={
+                "Content-Type": "application/json",
+                "x-rapidapi-host": _HOST,
+                "x-rapidapi-key": RAPIDAPI_KEY,
+            },
+            params={
+                "offset": str(offset),
+                "title_filter": title_filter,
+                "location_filter": location_filter,
+                "description_type": "text",
+            },
+            timeout=20,
         )
         resp.raise_for_status()
-        return [_format(j) for j in resp.json().get('data', [])]
+        data = resp.json()
+
+        if isinstance(data, dict) and data.get('message'):
+            msg = data['message']
+            if 'not subscribed' in msg.lower():
+                raise ValueError(
+                    "Not subscribed to this API. Go to rapidapi.com → search "
+                    "'LinkedIn Job Search API' → subscribe to the free plan."
+                )
+            raise ValueError(f"API error: {msg}")
+
+        jobs = data if isinstance(data, list) else data.get('data', data.get('jobs', []))
+        return [_format(j) for j in jobs]
+
     except requests.exceptions.HTTPError as e:
         code = e.response.status_code if e.response else 0
         if code == 429:
-            raise ValueError("API rate limit reached. Try again later or upgrade your RapidAPI plan.")
+            raise ValueError("Rate limit reached. Try again later or upgrade your RapidAPI plan.")
         if code == 403:
-            raise ValueError("Invalid RapidAPI key. Check your RAPIDAPI_KEY setting.")
+            raise ValueError("Invalid or unauthorised RapidAPI key.")
         raise ValueError(f"API error {code}: {e}")
     except requests.exceptions.Timeout:
         raise ValueError("Request timed out. Please try again.")
@@ -41,51 +70,77 @@ def search_jobs(query, location='', num_pages=1, date_posted='month'):
         raise ValueError(f"Network error: {e}")
 
 
+def _get(raw, *keys, default=''):
+    """Try multiple possible field names, return first match."""
+    for k in keys:
+        v = raw.get(k)
+        if v is not None and v != '':
+            return v
+    return default
+
+
 def _format(raw):
-    highlights = raw.get('job_highlights') or {}
-    qualifications = highlights.get('Qualifications') or []
-    benefits = highlights.get('Benefits') or []
+    title = _get(raw, 'title', 'job_title', 'position')
+    company = _get(raw, 'company', 'company_name', 'employer', 'organization')
+    location = _get(raw, 'location', 'job_location', 'city')
+    description = _get(raw, 'description', 'job_description', 'summary')
+    apply_url = _get(raw, 'url', 'apply_url', 'job_url', 'link', 'linkedin_url')
+    job_id = _get(raw, 'id', 'job_id', 'listing_id')
+    emp_type = str(_get(raw, 'employment_type', 'job_type', 'contract_type', default='Full-time')).lower()
+    seniority = str(_get(raw, 'seniority_level', 'level', 'experience_level', default='')).lower()
+    salary_raw = _get(raw, 'salary', 'salary_range', 'compensation', default='')
+    skills_raw = _get(raw, 'skills', 'required_skills', 'job_functions', 'function', default='')
+    industries = _get(raw, 'industries', 'industry', default='')
+    company_logo = _get(raw, 'company_logo', 'logo', 'company_logo_url', default='')
+    posted_raw = _get(raw, 'date', 'date_posted', 'posted_at', 'published_at', default='')
 
-    parts = [raw.get('job_city', ''), raw.get('job_state', ''), raw.get('job_country', '')]
-    location = ', '.join(p for p in parts if p) or ('Remote' if raw.get('job_is_remote') else 'Unknown')
+    job_type = _TYPE_MAP.get(emp_type, 'Full-time')
+    exp_level = 'Entry'
+    for key, val in _LEVEL_MAP.items():
+        if key in seniority:
+            exp_level = val
+            break
 
-    lo, hi = raw.get('job_min_salary'), raw.get('job_max_salary')
-    curr = raw.get('job_salary_currency', '$')
-    period = (raw.get('job_salary_period') or 'YEAR').lower()[:2]
-    if lo and hi:
-        salary = f"{curr}{int(lo):,} - {curr}{int(hi):,}/{period}"
-    elif lo:
-        salary = f"{curr}{int(lo):,}+/{period}"
+    if isinstance(salary_raw, dict):
+        lo = salary_raw.get('min') or salary_raw.get('from')
+        hi = salary_raw.get('max') or salary_raw.get('to')
+        curr = salary_raw.get('currency', '£')
+        salary = f"{curr}{int(lo):,} - {curr}{int(hi):,}" if lo and hi else (f"{curr}{int(lo):,}+" if lo else '')
     else:
-        salary = ''
+        salary = str(salary_raw) if salary_raw else ''
 
-    skills = raw.get('job_required_skills') or []
+    if isinstance(skills_raw, list):
+        skills = ', '.join(str(s) for s in skills_raw)
+    elif isinstance(industries, list):
+        skills = ', '.join(str(s) for s in industries)
+    else:
+        skills = str(skills_raw or industries or '')
 
-    apply_link = raw.get('job_apply_link') or ''
-    source = 'linkedin' if 'linkedin' in apply_link.lower() else (
-             'indeed' if 'indeed' in apply_link.lower() else 'other')
-
-    posted_raw = raw.get('job_posted_at_datetime_utc', '')
     try:
-        posted_at = datetime.fromisoformat(posted_raw.replace('Z', '+00:00')) if posted_raw else datetime.utcnow()
-    except ValueError:
+        if posted_raw:
+            posted_at = datetime.fromisoformat(str(posted_raw).replace('Z', '+00:00'))
+        else:
+            posted_at = datetime.utcnow()
+    except (ValueError, TypeError):
         posted_at = datetime.utcnow()
 
+    is_remote = 'remote' in str(location).lower() or 'remote' in str(title).lower()
+
     return {
-        'source_id': raw.get('job_id', ''),
-        'source': source,
-        'source_url': apply_link,
-        'title': raw.get('job_title', ''),
-        'company': raw.get('employer_name', ''),
-        'company_logo': raw.get('employer_logo') or '',
-        'location': location,
-        'description': raw.get('job_description', ''),
-        'requirements': '\n'.join(qualifications) if qualifications else '',
-        'job_type': _TYPE_MAP.get(raw.get('job_employment_type', ''), 'Full-time'),
-        'experience_level': 'Mid',
+        'source_id': str(job_id),
+        'source': 'linkedin',
+        'source_url': str(apply_url),
+        'title': str(title),
+        'company': str(company),
+        'company_logo': str(company_logo),
+        'location': str(location),
+        'description': str(description),
+        'requirements': '',
+        'job_type': job_type,
+        'experience_level': exp_level,
         'salary_range': salary,
-        'skills': ', '.join(skills) if skills else '',
-        'benefits': '\n'.join(benefits) if benefits else '',
-        'remote_option': 'Remote' if raw.get('job_is_remote') else 'On-site',
+        'skills': skills,
+        'benefits': '',
+        'remote_option': 'Remote' if is_remote else 'On-site',
         'posted_at': posted_at,
     }

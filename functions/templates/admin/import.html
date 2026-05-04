@@ -20,16 +20,18 @@
       </div>
     </div>
 
-    <!-- API Key Warning -->
+    <!-- API Key / Subscription Warning -->
     <div id="api-key-warning" class="hidden bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-yellow-800">
       <div class="flex items-start gap-3">
         <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
         </svg>
         <div>
-          <p class="font-semibold">RapidAPI key not configured</p>
-          <p class="text-sm mt-1">Get a free key at <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" class="underline font-medium">rapidapi.com → JSearch API</a>, then add it to your Firebase environment:<br>
-          <code class="bg-yellow-100 px-1 rounded text-xs">firebase functions:config:set rapidapi.key=YOUR_KEY</code> or add <code class="bg-yellow-100 px-1 rounded text-xs">RAPIDAPI_KEY=YOUR_KEY</code> to <code class="bg-yellow-100 px-1 rounded text-xs">functions/.env</code> and redeploy.</p>
+          <p class="font-semibold">Subscribe to the LinkedIn Job Search API</p>
+          <p class="text-sm mt-1">
+            1. Go to <a href="https://rapidapi.com/rockapis-rockapis-default/api/linkedin-job-search-api" target="_blank" class="underline font-medium">rapidapi.com → LinkedIn Job Search API</a> and subscribe to the free plan.<br>
+            2. Make sure <code class="bg-yellow-100 px-1 rounded text-xs">RAPIDAPI_KEY</code> is set in <code class="bg-yellow-100 px-1 rounded text-xs">functions/.env</code> and redeploy.
+          </p>
         </div>
       </div>
     </div>
@@ -46,15 +48,16 @@
             Search Jobs
           </h2>
           <div class="flex flex-col sm:flex-row gap-3">
-            <input id="search-query" type="text" placeholder="e.g. Python Developer, Marketing Manager"
+            <input id="title-filter" type="text" placeholder="e.g. entry level, software engineer, marketing"
                    class="input flex-1" onkeydown="if(event.key==='Enter') doSearch()">
-            <input id="search-location" type="text" placeholder="Location (optional)"
-                   class="input w-full sm:w-48" onkeydown="if(event.key==='Enter') doSearch()">
+            <input id="location-filter" type="text" placeholder="Location (default: United Kingdom)"
+                   class="input w-full sm:w-56" onkeydown="if(event.key==='Enter') doSearch()">
             <button onclick="doSearch()" id="search-btn"
                     class="btn btn-primary whitespace-nowrap">
               Search
             </button>
           </div>
+          <p class="text-xs text-muted-foreground mt-2">Returns jobs posted in the last hour from LinkedIn. Use <code class="bg-muted px-1 rounded">entry level</code>, <code class="bg-muted px-1 rounded">senior</code>, or any job title.</p>
         </div>
 
         <!-- Results -->
@@ -72,6 +75,13 @@
           </div>
 
           <div id="results-grid" class="space-y-3"></div>
+
+          <!-- Load More -->
+          <div id="load-more-wrap" class="hidden text-center mt-4">
+            <button onclick="loadMore()" id="load-more-btn" class="btn btn-outline">
+              Load More Jobs
+            </button>
+          </div>
         </div>
 
         <!-- Loading -->
@@ -100,9 +110,9 @@
 
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium mb-1">Search Terms <span class="text-muted-foreground">(one per line)</span></label>
+              <label class="block text-sm font-medium mb-1">Job Title Filters <span class="text-muted-foreground">(one per line)</span></label>
               <textarea id="auto-terms" rows="4" class="form-textarea w-full text-sm"
-                        placeholder="Software Engineer&#10;Product Manager&#10;Data Scientist">{{ (auto_config.search_terms or []) | join('\n') }}</textarea>
+                        placeholder="entry level&#10;software engineer&#10;marketing manager">{{ (auto_config.search_terms or []) | join('\n') }}</textarea>
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Location</label>
@@ -129,8 +139,8 @@
 
         <div class="bg-card rounded-lg border border-border p-4 text-sm text-muted-foreground space-y-2">
           <p class="font-medium text-foreground">About this feature</p>
-          <p>Jobs are sourced via the <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" class="text-primary underline">JSearch API</a>, which aggregates listings from LinkedIn, Indeed, Glassdoor and others.</p>
-          <p>Free tier: 200 requests/month. Duplicate jobs (same source ID) are skipped automatically.</p>
+          <p>Jobs are pulled directly from <strong>LinkedIn</strong> via the <a href="https://rapidapi.com/rockapis-rockapis-default/api/linkedin-job-search-api" target="_blank" class="text-primary underline">LinkedIn Job Search API</a> on RapidAPI.</p>
+          <p>Results are jobs posted in the <strong>last hour</strong>. Duplicate jobs are skipped automatically based on their LinkedIn ID.</p>
         </div>
       </div>
     </div>
@@ -139,34 +149,56 @@
 
 <script>
 let searchResults = [];
+let currentOffset = 0;
 
 async function doSearch() {
-  const query = document.getElementById('search-query').value.trim();
-  const location = document.getElementById('search-location').value.trim();
-  if (!query) { alert('Please enter a search term.'); return; }
+  currentOffset = 0;
+  searchResults = [];
+  document.getElementById('results-grid').innerHTML = '';
+  hide('load-more-wrap');
+  await fetchJobs(0, true);
+}
 
-  hide('results-section'); hide('error-box'); hide('success-box');
+async function loadMore() {
+  currentOffset += 10;
+  await fetchJobs(currentOffset, false);
+}
+
+async function fetchJobs(offset, isNewSearch) {
+  const titleFilter = document.getElementById('title-filter').value.trim();
+  const locationFilter = document.getElementById('location-filter').value.trim() || 'United Kingdom';
+  if (!titleFilter) { alert('Please enter a job title or level.'); return; }
+
+  if (isNewSearch) { hide('results-section'); hide('error-box'); hide('success-box'); }
   show('loading');
   document.getElementById('search-btn').disabled = true;
+  document.getElementById('load-more-btn') && (document.getElementById('load-more-btn').disabled = true);
 
   try {
     const resp = await fetch('{{ url_for("admin_dashboard.import_search") }}', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
-      body: JSON.stringify({ query, location })
+      body: JSON.stringify({ title_filter: titleFilter, location_filter: locationFilter, offset })
     });
     const data = await resp.json();
     hide('loading');
     document.getElementById('search-btn').disabled = false;
+    document.getElementById('load-more-btn') && (document.getElementById('load-more-btn').disabled = false);
 
     if (data.error) {
-      if (data.error.includes('RAPIDAPI_KEY')) show('api-key-warning');
+      if (data.error.toLowerCase().includes('subscri') || data.error.toLowerCase().includes('key'))
+        show('api-key-warning');
       document.getElementById('error-box').textContent = data.error;
       show('error-box'); return;
     }
 
-    searchResults = data.results;
-    renderResults(data.results);
+    searchResults = isNewSearch ? data.results : [...searchResults, ...data.results];
+    if (isNewSearch) renderResults(data.results);
+    else appendResults(data.results, offset);
+
+    // Show load more if we got a full page
+    if (data.results.length >= 10) show('load-more-wrap');
+    else hide('load-more-wrap');
   } catch (e) {
     hide('loading');
     document.getElementById('search-btn').disabled = false;
@@ -176,20 +208,24 @@ async function doSearch() {
 }
 
 function renderResults(results) {
-  const count = document.getElementById('results-count');
   const grid = document.getElementById('results-grid');
-  count.textContent = `${results.length} job${results.length !== 1 ? 's' : ''} found`;
   grid.innerHTML = '';
+  updateCount();
+  appendResults(results, 0);
+  show('results-section');
+}
 
+function appendResults(results, offset) {
+  const grid = document.getElementById('results-grid');
+  updateCount();
   results.forEach((job, i) => {
+    const idx = offset + i;
     const imported = job.already_imported;
-    const sourceLabel = job.source === 'linkedin' ? '🔵 LinkedIn' :
-                        job.source === 'indeed' ? '🟠 Indeed' : '🌐 Other';
     grid.insertAdjacentHTML('beforeend', `
       <div class="bg-card border border-border rounded-lg p-4 flex gap-4 ${imported ? 'opacity-60' : ''}">
         <div class="flex items-start pt-1">
           <input type="checkbox" class="job-checkbox w-4 h-4 mt-0.5 accent-primary"
-                 data-index="${i}" ${imported ? 'disabled' : ''} ${imported ? '' : 'checked'}>
+                 data-index="${idx}" ${imported ? 'disabled' : ''} ${imported ? '' : 'checked'}>
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex flex-wrap items-center gap-2 mb-1">
@@ -201,7 +237,7 @@ function renderResults(results) {
             <span class="badge badge-secondary">${esc(job.job_type)}</span>
             ${job.salary_range ? `<span class="badge badge-secondary">${esc(job.salary_range)}</span>` : ''}
             ${job.remote_option ? `<span class="badge badge-secondary">${esc(job.remote_option)}</span>` : ''}
-            <span class="text-muted-foreground">${sourceLabel}</span>
+            <span class="text-muted-foreground">🔵 LinkedIn</span>
             ${job.posted_at ? `<span class="text-muted-foreground">${esc(job.posted_at)}</span>` : ''}
           </div>
           ${job.skills ? `<p class="text-xs text-muted-foreground mt-2">Skills: ${esc(job.skills.split(',').slice(0,5).join(', '))}</p>` : ''}
@@ -214,7 +250,11 @@ function renderResults(results) {
       </div>
     `);
   });
-  show('results-section');
+}
+
+function updateCount() {
+  document.getElementById('results-count').textContent =
+    `${searchResults.length} job${searchResults.length !== 1 ? 's' : ''} found`;
 }
 
 async function importSelected() {

@@ -128,18 +128,18 @@ def import_jobs_page():
 @admin_required
 def import_search():
     from import_jobs import search_jobs
-    query = request.json.get('query', '').strip()
-    location = request.json.get('location', '').strip()
-    if not query:
-        return jsonify({'error': 'Search query is required.'}), 400
+    title_filter = request.json.get('title_filter', '').strip()
+    location_filter = request.json.get('location_filter', 'United Kingdom').strip()
+    offset = int(request.json.get('offset', 0))
+    if not title_filter:
+        return jsonify({'error': 'Job title is required.'}), 400
     try:
-        results = search_jobs(query, location, num_pages=1)
-        # flag already-imported jobs
+        results = search_jobs(title_filter, location_filter, offset=offset)
         for job in results:
             job['already_imported'] = Job.source_id_exists(job['source_id']) if job['source_id'] else False
             if isinstance(job.get('posted_at'), datetime):
                 job['posted_at'] = job['posted_at'].strftime('%b %d, %Y')
-        return jsonify({'results': results})
+        return jsonify({'results': results, 'offset': offset})
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 

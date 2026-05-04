@@ -48,7 +48,7 @@ def auto_import_jobs(event: scheduler_fn.ScheduledEvent) -> None:
     total_imported = 0
     for term in search_terms:
         try:
-            results = search_jobs(term, location, num_pages=1)
+            results = search_jobs(term, location or 'United Kingdom')
             for data in results:
                 source_id = data.get('source_id', '')
                 if source_id and Job.source_id_exists(source_id):
