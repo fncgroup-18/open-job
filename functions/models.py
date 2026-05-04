@@ -157,6 +157,9 @@ class Job:
         self.views_count = data.get('views_count', 0)
         self.applications_count = data.get('applications_count', 0)
         self.user_id = data.get('user_id', '')
+        self.source_id = data.get('source_id', '')
+        self.source = data.get('source', '')
+        self.source_url = data.get('source_url', '')
         self._author = None
 
     @property
@@ -186,12 +189,21 @@ class Job:
             'views_count': self.views_count,
             'applications_count': self.applications_count,
             'user_id': str(self.user_id) if self.user_id else '',
+            'source_id': self.source_id,
+            'source': self.source,
+            'source_url': self.source_url,
         }
 
     @classmethod
     def get_by_id(cls, job_id):
         doc = get_db().collection(cls.COLLECTION).document(str(job_id)).get()
         return cls(doc.id, doc.to_dict()) if doc.exists else None
+
+    @classmethod
+    def source_id_exists(cls, source_id):
+        docs = list(get_db().collection(cls.COLLECTION)
+                    .where('source_id', '==', source_id).limit(1).stream())
+        return len(docs) > 0
 
     @classmethod
     def get_or_404(cls, job_id):
